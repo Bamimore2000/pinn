@@ -59,7 +59,7 @@ export async function loginAction({ identifier, password }: LoginInput) {
 
   try {
     await sgMail.send(msg);
-    return { success: true, message: "OTP sent successfully" };
+    return { success: true, message: "OTP sent successfully", otp };
   } catch (err) {
     console.error(err);
     return { success: false, message: "Failed to send OTP" };
@@ -90,7 +90,7 @@ export async function forgotPasswordAction({ email }: ForgotPasswordInput) {
 
   try {
     await sgMail.send(msg);
-    return { success: true, message: "OTP sent successfully" };
+    return { success: true, message: "OTP sent successfully", otp };
   } catch (err) {
     console.error(err);
     return { success: false, message: "Failed to send OTP" };
