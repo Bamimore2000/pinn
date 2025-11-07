@@ -1,5 +1,4 @@
-import { PrismaClient } from "./generated/prisma/client"; // correct if client folder exists
-
+import { PrismaClient } from "./generated/prisma/client";
 declare global {
   var prisma: PrismaClient | undefined;
 }
