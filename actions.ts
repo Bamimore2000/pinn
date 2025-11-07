@@ -29,16 +29,17 @@ const generateOtp = () =>
 
 // ------------------ LOGIN ------------------
 export async function loginAction({ identifier, password }: LoginInput) {
+  const normalizedIdentifier = identifier.toLowerCase();
+
   const user = await prisma.user.findFirst({
     where: {
       OR: [
-        { email: { equals: identifier, mode: "insensitive" } },
-        { phone: identifier },
+        { email: { equals: normalizedIdentifier, mode: "insensitive" } },
+        { phone: normalizedIdentifier },
       ],
-      password, // in production, hash passwords!
+      password, // ⚠️ TODO: hash this in production!
     },
   });
-
   if (!user)
     return { success: false, message: "Invalid email/phone or password" };
 
