@@ -60,7 +60,10 @@ export default function LoginPage({
         onNavigateTo2FA();
       }, 500);
     } catch (err) {
-      toast.error("Something went wrong");
+      console.log({ err });
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else toast.error("Something went wrong");
       console.error(err);
     } finally {
       setIsLoading(false);
