@@ -127,7 +127,7 @@ export default function SettingsPage({ onLogout }: SettingsPageProps) {
             {/* Read-only fields */}
             <div>
               <Label className="mb-1">Email</Label>
-              <Input value={userData?.email ?? ""} readOnly />
+              <Input value={userData?.email ?? ""} />
             </div>
             <div>
               <Label className="mb-1">Account Number</Label>
