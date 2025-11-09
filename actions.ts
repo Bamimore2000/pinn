@@ -130,3 +130,33 @@ export async function resetPasswordAction({
 
   return { success: true, message: "Password updated successfully" };
 }
+
+export async function getUserByEmail(email: string) {
+  try {
+    if (!email || typeof email !== "string") {
+      throw new Error("Invalid email provided.");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return { error: "User not found." };
+    }
+
+    return { success: true, user };
+  } catch (error: any) {
+    console.error("❌ Error fetching user:", error);
+    return { error: error.message || "An unexpected error occurred." };
+  }
+}
+
+export async function updateUserByEmail(email: string, updates: Partial<any>) {
+  if (!email) throw new Error("Email is required");
+  const updatedUser = await prisma.user.update({
+    where: { email },
+    data: updates,
+  });
+  return updatedUser;
+}

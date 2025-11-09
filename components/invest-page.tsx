@@ -15,6 +15,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import BottomNav from "./bottomNav";
 
 interface InvestPageProps {
   onLogout: () => void;
@@ -317,71 +318,7 @@ export default function InvestPage({ onLogout, onNavigate }: InvestPageProps) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-around">
-          <button
-            onClick={() => onNavigate("home")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m0 0l4 4m-4-4v4"
-              />
-            </svg>
-            <span className="text-xs font-medium">Home</span>
-          </button>
-          <button
-            onClick={() => onNavigate("transfers")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-            <span className="text-xs font-medium">Transfers</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 p-2 text-accent">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs font-medium">Invest</span>
-          </button>
-          <button
-            onClick={() => onNavigate("analytics")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7H5v12h8V7zM13 3h6v4h-6V3z"
-              />
-            </svg>
-            <span className="text-xs font-medium">Analytics</span>
-          </button>
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

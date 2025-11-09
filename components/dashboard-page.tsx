@@ -35,9 +35,11 @@ import { TransactionHistory } from "./transaction-detail-drawer";
 import CardsComponent, { CardItem } from "./cardsPage";
 import { toast } from "sonner";
 import Image from "next/image";
+import BottomNav from "./bottomNav";
 interface DashboardPageProps {
   onLogout: () => void;
   onNavigate: (page: "home" | "transfers" | "invest" | "analytics") => void;
+  data?: Record<string, any>;
 }
 
 const mockSpendingData = [
@@ -59,6 +61,7 @@ const mockCategoryData = [
 export default function DashboardPage({
   onLogout,
   onNavigate,
+  data,
 }: DashboardPageProps) {
   const [showBalance, setShowBalance] = useState(true);
   const [isCardsDrawerOpen, setIsCardsDrawerOpen] = useState(false);
@@ -86,6 +89,8 @@ export default function DashboardPage({
       status: "active",
     },
   ];
+
+  console.log("User Data in DashboardPage:", data);
 
   const [selectedTransaction, setSelectedTransaction] = useState<
     (typeof mockTransactions)[0] | null
@@ -164,7 +169,11 @@ export default function DashboardPage({
       <main className="max-w-7xl mx-auto px-4 py-8 pb-32">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            {greeting}, Gurrie Anthony
+            {greeting},{" "}
+            {data?.firstName || data?.lastName
+              ? `${data?.firstName ?? ""} ${data?.lastName ?? ""}`.trim()
+              : "User"}
+            !
           </h2>
           <p className="text-muted-foreground">
             Here's your financial overview
@@ -470,38 +479,7 @@ export default function DashboardPage({
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t z-[100] border-border">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-around">
-          <button
-            onClick={() => onNavigate("home")}
-            className="flex flex-col items-center gap-1 p-2 text-accent"
-          >
-            <Wallet className="w-6 h-6" />
-            <span className="text-xs font-medium">Home</span>
-          </button>
-          <button
-            onClick={() => onNavigate("transfers")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Send className="w-6 h-6" />
-            <span className="text-xs font-medium">Transfers</span>
-          </button>
-          <button
-            onClick={() => onNavigate("invest")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs font-medium">Invest</span>
-          </button>
-          <button
-            onClick={() => onNavigate("analytics")}
-            className="flex flex-col items-center gap-1 p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <TrendingDown className="w-6 h-6" />
-            <span className="text-xs font-medium">Analytics</span>
-          </button>
-        </div>
-      </nav>
+      <BottomNav />
 
       {/* Transaction Detail Drawer Component */}
       <TransactionDetailDrawer

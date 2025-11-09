@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
+// Card Item Type
 export interface CardItem {
   id: number;
   type: string;
@@ -28,16 +29,36 @@ export interface CardItem {
   balance: number;
   status: "active" | "locked";
   gradient?: string;
-  chipColor?: string;
 }
 
+// Card templates object for reuse
+export const cardTemplates: CardItem[] = [
+  {
+    id: 1,
+    type: "Black Titanium",
+    number: "1234567890123456",
+    balance: 12000,
+    status: "active",
+    gradient: "from-purple-600 via-pink-500 to-rose-500",
+  },
+  {
+    id: 2,
+    type: "Emerald Card",
+    number: "9876543210987654",
+    balance: 8000,
+    status: "locked",
+    gradient: "from-emerald-500 via-teal-500 to-cyan-600",
+  },
+  // Add more predefined cards here
+];
+
 interface CardsComponentProps {
-  cards: CardItem[];
+  cards?: CardItem[];
   onAddCard?: () => void;
   onToggleCardStatus?: (cardId: number) => void;
 }
 
-const premiumGradients = [
+const defaultGradients = [
   "from-purple-600 via-pink-500 to-rose-500",
   "from-emerald-500 via-teal-500 to-cyan-600",
   "from-amber-500 via-orange-500 to-red-600",
@@ -46,7 +67,7 @@ const premiumGradients = [
 ];
 
 export default function CardsComponent({
-  cards,
+  cards = cardTemplates,
   onAddCard,
   onToggleCardStatus,
 }: CardsComponentProps) {
@@ -74,9 +95,7 @@ export default function CardsComponent({
 
   return (
     <div className="space-y-8 p-2 pb-12 bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
-      {/* Header */}
-
-      {/* Add New Card - Premium */}
+      {/* Add New Card */}
       <Card
         onClick={onAddCard}
         className="group relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black border-0 shadow-2xl cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-3xl"
@@ -96,11 +115,11 @@ export default function CardsComponent({
         </CardContent>
       </Card>
 
-      {/* Premium Cards Grid */}
+      {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
         {cards.map((card, index) => {
           const gradient =
-            card.gradient || premiumGradients[index % premiumGradients.length];
+            card.gradient || defaultGradients[index % defaultGradients.length];
           const isBalanceVisible = showBalance[card.id] ?? true;
 
           return (
@@ -119,12 +138,6 @@ export default function CardsComponent({
                   gradient
                 )}
               >
-                {/* Animated Background Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]" />
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-3xl -translate-y-12 translate-x-12" />
-                </div>
-
                 {/* Chip */}
                 <div className="absolute top-4 right-4 w-10 h-8 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-lg shadow-inner flex items-center justify-center">
                   <div className="w-7 h-5 bg-gradient-to-br from-yellow-300 to-amber-500 rounded" />
@@ -155,14 +168,12 @@ export default function CardsComponent({
                 </CardHeader>
 
                 <CardContent className="relative z-10 px-4">
-                  {/* Card Number */}
                   <div className="mb-4">
                     <p className="font-mono text-lg tracking-widest drop-shadow-md">
                       {card.number.replace(/(\d{4})/g, "$1 ")}
                     </p>
                   </div>
 
-                  {/* Balance Section */}
                   <div className="flex items-end justify-between">
                     <div>
                       <p className="text-white/70 text-sm font-medium mb-1">
@@ -170,9 +181,7 @@ export default function CardsComponent({
                       </p>
                       <p className="text-2xl font-bold tracking-tight">
                         {isBalanceVisible ? (
-                          <span className="drop-shadow-lg">
-                            {formatBalance(card.balance)}
-                          </span>
+                          formatBalance(card.balance)
                         ) : (
                           <span className="tracking-widest">••••••••</span>
                         )}
@@ -190,7 +199,6 @@ export default function CardsComponent({
                     </button>
                   </div>
 
-                  {/* Status Badge */}
                   <div className="mt-4 flex items-center gap-2">
                     <div
                       className={cn(
@@ -205,71 +213,10 @@ export default function CardsComponent({
                     <CreditCard className="w-4 h-4 opacity-60" />
                   </div>
                 </CardContent>
-
-                {/* Holographic Effect */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -skew-x-12 translate-x-28 group-hover:translate-x-0 transition-transform duration-1000" />
-                </div>
               </Card>
             </div>
           );
         })}
-      </div>
-
-      {/* Premium Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md border-0 shadow-2xl bg-gradient-to-br from-gray-900 to-black text-white">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-2xl" />
-          <DialogHeader className="relative z-10">
-            <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Card Status Confirmed
-            </DialogTitle>
-          </DialogHeader>
-          <div className="relative z-10 py-8 text-center space-y-4">
-            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-xl">
-              {selectedCard?.status === "active" ? (
-                <Unlock className="w-10 h-10 text-white" />
-              ) : (
-                <Lock className="w-10 h-10 text-white" />
-              )}
-            </div>
-            <div>
-              <p className="text-lg font-semibold">{selectedCard?.type}</p>
-              <p className="text-white/70">
-                •••• {selectedCard?.number.slice(-4)}
-              </p>
-            </div>
-            <p className="text-xl">
-              Card is now{" "}
-              <span
-                className={cn(
-                  "font-bold",
-                  selectedCard?.status === "active"
-                    ? "text-green-400"
-                    : "text-red-400"
-                )}
-              >
-                {selectedCard?.status === "active" ? "ACTIVE" : "LOCKED"}
-              </span>
-            </p>
-            <Button
-              onClick={() => setIsDialogOpen(false)}
-              className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-6 rounded-xl shadow-lg transform transition-all hover:scale-105"
-            >
-              Close Vault
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Footer */}
-      <div className="text-center mt-12">
-        <p className="text-sm text-gray-500">
-          Secured by{" "}
-          <span className="font-semibold text-gray-700">
-            256-bit AES • FDIC Insured • PCI DSS
-          </span>
-        </p>
       </div>
     </div>
   );
