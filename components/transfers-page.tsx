@@ -36,70 +36,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import BottomNav from "./bottomNav";
 import { cardTemplates } from "./cardsPage";
+import { Recipient } from "@/app/types";
+import { initialRecipients } from "@/data/data";
 
 interface TransfersPageProps {
   onLogout: () => void;
   onNavigate: (page: "home" | "transfers" | "invest" | "analytics") => void;
 }
-
-interface Recipient {
-  id: number;
-  name: string;
-  account: string;
-  initials: string;
-  email?: string;
-  phone?: string;
-  zelleEmail?: string;
-  zellePhone?: string;
-  cashappTag?: string;
-  bankAccountName?: string;
-  bankName?: string;
-  routingNumber?: string;
-  accountNumber?: string;
-}
-
-const initialRecipients: Recipient[] = [
-  {
-    id: 1,
-    name: "Olivia Parker",
-    account: "•••• 4821",
-    initials: "OP",
-    bankAccountName: "Olivia Parker",
-    bankName: "Chase Bank",
-    routingNumber: "021000021",
-    accountNumber: "1234567821",
-  },
-  {
-    id: 2,
-    name: "Liam Thompson",
-    account: "•••• 5739",
-    initials: "LT",
-    bankAccountName: "Liam Thompson",
-    bankName: "Wells Fargo",
-    routingNumber: "121000248",
-    accountNumber: "9876545739",
-  },
-  {
-    id: 3,
-    name: "Sophia Martinez",
-    account: "•••• 3045",
-    initials: "SM",
-    bankAccountName: "Sophia Martinez",
-    bankName: "Bank of America",
-    routingNumber: "026009593",
-    accountNumber: "5551233045",
-  },
-  {
-    id: 4,
-    name: "Noah Wilson",
-    account: "•••• 7213",
-    initials: "NW",
-    bankAccountName: "Noah Wilson",
-    bankName: "Citibank",
-    routingNumber: "021000089",
-    accountNumber: "7778887213",
-  },
-];
 
 const recentTransactions = [
   {
@@ -221,6 +164,7 @@ export default function TransfersPage({
   const [newBankName, setNewBankName] = useState("");
   const [newRoutingNumber, setNewRoutingNumber] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
+  const [showOwnershipModal, setShowOwnershipModal] = useState(false);
 
   const handleRecipientSelect = (recipient: Recipient) => {
     setSelectedRecipient(recipient);
@@ -352,14 +296,23 @@ export default function TransfersPage({
   };
 
   const handlePinSubmit = () => {
-    setShowPinModal(false);
-    setPin("");
+    if (pin === "9900") {
+      // Correct PIN
+      setShowPinModal(false); // close PIN modal
+      setPin(""); // reset PIN
 
-    setTimeout(() => {
-      toast.error("Incorrect Password", {
-        description: "The PIN you entered is incorrect. Please try again.",
-      });
-    }, 300);
+      // Show ownership/payment modal
+      setShowOwnershipModal(true);
+    } else {
+      // Incorrect PIN
+      setShowPinModal(false);
+      setPin("");
+      setTimeout(() => {
+        toast.error("Incorrect Password", {
+          description: "The PIN you entered is incorrect. Please try again.",
+        });
+      }, 300);
+    }
   };
 
   const getPaymentMethodIcon = (method: string) => {
@@ -1109,6 +1062,39 @@ export default function TransfersPage({
             >
               Cancel
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ownership Change / Payment Modal */}
+      <Dialog open={showOwnershipModal} onOpenChange={setShowOwnershipModal}>
+        <DialogContent className="sm:max-w-[420px] animate-in fade-in zoom-in duration-300">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold">
+              Account Ownership Change Detected
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              We detected a change in account ownership. This transfer will not
+              go through until a $150 payment is made.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-6 py-6">
+            <p className="text-center text-foreground">
+              Please make the payment here to continue:
+            </p>
+            <Button
+              onClick={() => (window.location.href = "/payment")}
+              className="w-full h-12 bg-accent hover:bg-accent/90 font-semibold text-base transition-all hover:scale-[1.02] active:scale-95"
+            >
+              Go to Payment
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowOwnershipModal(false)}
+              className="w-full h-12 font-semibold text-base transition-all hover:scale-[1.02] active:scale-95"
+            >
+              Cancel
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

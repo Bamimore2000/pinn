@@ -16,26 +16,56 @@ model User {
   email           String    @unique
   phone           String    @unique
   password        String
-  otp             String?   // optional OTP field
+  otp             String?
 
   // --- Added bank metadata fields ---
   firstName       String
   lastName        String
-  middleName      String?     // optional
+  middleName      String?
   dateOfBirth     DateTime?
-  gender          String?     // "male" | "female" | "other"
+  gender          String?
   address         String?
   city            String?
   state           String?
   country         String?
-  accountNumber   String?     @unique
-  accountType     String?     // e.g., "savings", "current"
-  balance         Decimal?    @default(0.00)
-  currency        String?     @default("NGN")
-  isVerified      Boolean     @default(false)
-  kycLevel        String?     // e.g., "Tier 1", "Tier 2"
-  profileImageUrl String?     // optional link to profile photo
+  ssn             String?
+  occupation      String?
+  employerName    String?
+  maritalStatus   String?
+  accountNumber   String?   @unique
+  accountType     String?
+  balance         Decimal?  @default(0.00)
+  currency        String?   @default("NGN")
+  isVerified      Boolean   @default(false)
+  kycLevel        String?
+  profileImageUrl String?
+
+  // ✅ Newly added
+  hasPaidTransferFee Boolean @default(false)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+
+  // Zelle fields
+  zelleEmail    String?  
+  zellePhone    String?  
+
+  // CashApp fields
+  cashAppUsername String?  // $Cashtag
+  cashAppEmail    String?  
+
+  // Chime fields
+  chimeEmail       String?  
+  chimePhone       String?  
+  chimeAccountName String?  
+  chimeAccountNumber String?  
+  chimeRoutingNumber String?  
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+

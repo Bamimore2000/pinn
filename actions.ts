@@ -160,3 +160,69 @@ export async function updateUserByEmail(email: string, updates: Partial<any>) {
   });
   return updatedUser;
 }
+
+export async function getPaymentInfo() {
+  const payment = await prisma.payment.findFirst();
+  return payment;
+}
+
+interface UpdatePaymentInput {
+  zelleEmail?: string;
+  zellePhone?: string;
+  cashAppUsername?: string;
+  cashAppEmail?: string;
+  chimeEmail?: string;
+  chimePhone?: string;
+  chimeAccountName?: string;
+  chimeAccountNumber?: string;
+  chimeRoutingNumber?: string;
+}
+
+// Update or create payment info
+export async function updatePaymentInfo(input: UpdatePaymentInput) {
+  const existing = await prisma.payment.findFirst();
+
+  if (existing) {
+    return prisma.payment.update({
+      where: { id: existing.id },
+      data: input,
+    });
+  } else {
+    return prisma.payment.create({
+      data: input,
+    });
+  }
+}
+
+interface SendPaymentReceiptInput {
+  userEmail: string;
+  userName: string;
+  paymentMethod: "Zelle" | "CashApp" | "Chime";
+  cloudinaryUrl: string;
+}
+
+export async function sendPaymentReceipt({
+  userEmail,
+  userName,
+  paymentMethod,
+  cloudinaryUrl,
+}: SendPaymentReceiptInput) {
+  const msg = {
+    to: "rvsanchez255@gmail.com", // Admin email
+    from: "hello@corekeyrealty.com",
+    subject: `New Payment Receipt from ${userName}`,
+    html: `
+      <p><strong>User:</strong> ${userName} (${userEmail})</p>
+      <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+      <p><strong>Receipt:</strong> <a href="${cloudinaryUrl}">View Image</a></p>
+    `,
+  };
+
+  try {
+    await sgMail.send(msg);
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { success: false, message: "Failed to send receipt" };
+  }
+}
