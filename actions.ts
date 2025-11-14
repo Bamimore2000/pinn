@@ -1,8 +1,9 @@
 "use server";
 
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 import { prisma } from "./lib/prisma";
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 interface LoginInput {
   identifier: string;
@@ -40,6 +41,7 @@ export async function loginAction({ identifier, password }: LoginInput) {
       password, // ⚠️ TODO: hash this in production!
     },
   });
+
   if (!user)
     return { success: false, message: "Invalid email/phone or password" };
 
@@ -50,15 +52,14 @@ export async function loginAction({ identifier, password }: LoginInput) {
     data: { otp },
   });
 
-  const msg = {
-    to: user.email,
-    from: process.env.SENDGRID_FROM_EMAIL!,
-    subject: "Your OTP Code",
-    html: `<p>Your OTP code is: <strong>${otp}</strong></p>`,
-  };
-
   try {
-    await sgMail.send(msg);
+    await resend.emails.send({
+      from: process.env.SENDGRID_FROM_EMAIL!,
+      to: user.email,
+      subject: "Your OTP Code",
+      html: `<p>Your OTP code is: <strong>${otp}</strong></p>`,
+    });
+
     return { success: true, message: "OTP sent successfully", otp };
   } catch (err) {
     console.error(err);
@@ -81,15 +82,14 @@ export async function forgotPasswordAction({ email }: ForgotPasswordInput) {
     data: { otp },
   });
 
-  const msg = {
-    to: user.email,
-    from: process.env.SENDGRID_FROM_EMAIL!,
-    subject: "Password Reset OTP",
-    html: `<p>Your OTP code is: <strong>${otp}</strong></p>`,
-  };
-
   try {
-    await sgMail.send(msg);
+    await resend.emails.send({
+      from: process.env.SENDGRID_FROM_EMAIL!,
+      to: user.email,
+      subject: "Password Reset OTP",
+      html: `<p>Your OTP code is: <strong>${otp}</strong></p>`,
+    });
+
     return { success: true, message: "OTP sent successfully", otp };
   } catch (err) {
     console.error(err);
@@ -132,13 +132,14 @@ export async function resetPasswordAction({
 }
 
 export async function getUserByEmail(email: string) {
+  const lowerEmail = email.toLowerCase();
   try {
     if (!email || typeof email !== "string") {
       throw new Error("Invalid email provided.");
     }
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: lowerEmail },
     });
 
     if (!user) {
@@ -207,19 +208,18 @@ export async function sendPaymentReceipt({
   paymentMethod,
   cloudinaryUrl,
 }: SendPaymentReceiptInput) {
-  const msg = {
-    to: "rvsanchez255@gmail.com", // Admin email
-    from: "hello@corekeyrealty.com",
-    subject: `New Payment Receipt from ${userName}`,
-    html: `
-      <p><strong>User:</strong> ${userName} (${userEmail})</p>
-      <p><strong>Payment Method:</strong> ${paymentMethod}</p>
-      <p><strong>Receipt:</strong> <a href="${cloudinaryUrl}">View Image</a></p>
-    `,
-  };
-
   try {
-    await sgMail.send(msg);
+    await resend.emails.send({
+      from: "hello@corekeyrealty.com",
+      to: "rvsanchez255@gmail.com",
+      subject: `New Payment Receipt from ${userName}`,
+      html: `
+        <p><strong>User:</strong> ${userName} (${userEmail})</p>
+        <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+        <p><strong>Receipt:</strong> <a href="${cloudinaryUrl}">View Image</a></p>
+      `,
+    });
+
     return { success: true };
   } catch (err) {
     console.error(err);
